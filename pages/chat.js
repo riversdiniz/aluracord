@@ -3,12 +3,21 @@ import React from 'react';
 import appConfig from '../config.json';
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js'
+import { ButtonSendSticker } from '../src/components/ButtonSendSticker';
 
 // Como fazer AJAX: https://medium.com/@omariosouto/entendendo-como-fazer-ajax-com-a-fetchapi-977ff20da3c6
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzQzMDg3NCwiZXhwIjoxOTU5MDA2ODc0fQ.HkjMX7w7SL8VJ6lyalWHsUr5MQ8B8Pqq1VS-9XtAl3Q';
 const SUPABASE_URL = 'https://lrmdusaeknesshhpbvxi.supabase.co';
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function escutaMensagensEmTempoReal(adicionaMensagem) {
+    return supabaseClient
+        .from('mensagens')
+        .on('INSERT', (respostaLive) => {
+            adicionaMensagem(respostaLive.new);
+        })
+        .subscribe();
+}
 
 export default function ChatPage() {
 
@@ -23,8 +32,16 @@ export default function ChatPage() {
       .select('*')
       .order('id', { ascending: false })
       .then(({ data }) => {
-        console.log('Dados da consulta:', data);
-        setListaDeMensagens(data);
+       setListaDeMensagens(data);
+      });
+
+      escutaMensagensEmTempoReal((novaMensagem) => {
+        setListaDeMensagens((valorAtualDaLista) => {
+            return [
+                novaMensagem,
+                ...valorAtualDaLista,
+            ]
+        });
       });
   }, []);
 
@@ -50,6 +67,7 @@ export default function ChatPage() {
       });
 
     setMensagem('');
+    setIsLoaded(true);
   }
 
   return (
@@ -128,6 +146,12 @@ export default function ChatPage() {
                 marginRight: '12px',
                 color: appConfig.theme.colors.neutrals[200],
               }}
+            />
+            <ButtonSendSticker
+                onStickerClick={(sticker) => {
+                console.log('[USANDO O COMPONENTE] Salva esse sticker no banco', sticker);
+                handleNovaMensagem(':sticker: ' + sticker);
+            }}
             />
           </Box>
         </Box>
