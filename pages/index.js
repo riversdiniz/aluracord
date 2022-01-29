@@ -60,7 +60,7 @@ function Titulo(props) {
 // export default HomePage
 
 export default function PaginaInicial() {
-  const username = 'peas';
+  const username = 'batman';
 
   return (
     <>
@@ -148,7 +148,7 @@ export default function PaginaInicial() {
                 borderRadius: '50%',
                 marginBottom: '16px',
               }}
-              src={`https://github.com/${username}.png`}
+              src={`https://img1.pnghut.com/20/9/22/9rQLbEK4A3/animation-superhero-cartoon-comic-book-dc-animated-universe.jpg`}
             />
             <Text
               variant="body4"
